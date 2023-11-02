@@ -1,12 +1,13 @@
 {
   "name": "public-transportation",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
-    "server": "nodemon index.js",
+    "start": "node index.js",
+    "server": "node index.js",
     "studio": "npx prisma studio",
     "db-push": "npx prisma db push",
     "generate": "npx prisma generate"
@@ -15,13 +16,15 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.4.2",
-    "express": "^4.18.2"
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "engines": {
     "node": ">=14.20.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
     "prisma": "^5.4.2"
   }
 }

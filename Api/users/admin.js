@@ -9,24 +9,24 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const router = express.Router();
 
-// Create a new user
+// Create a new admin
 router.post("/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        const existinguser = await prisma.user.findUnique({
+        const existingadmin = await prisma.admin.findUnique({
             where: {
                 email: email,
             },
         });
 
-        if (existinguser) {
-            return res.status(409).json({ message: "user already exists." });
+        if (existingadmin) {
+            return res.status(409).json({ message: "admin already exists." });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newuser = await prisma.user.create({
+        const newadmin = await prisma.admin.create({
             data: {
                 name: name,
                 email: email,
@@ -35,33 +35,33 @@ router.post("/signup", async (req, res) => {
         });
 
         return res.status(201).json({
-            message: "user successfully created.",
-            user: newuser,
+            message: "admin successfully created.",
+            admin: newadmin,
         });
     } catch (error) {
-        return res.status(500).json({ message: "Failed to create user." });
+        return res.status(500).json({ message: "Failed to create admin." });
     }
 });
 
-// users logins
+// admins logins
 
 router.post("/login", authenticate, async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const existinguser = await prisma.user.findUnique({
+        const existingadmin = await prisma.admin.findUnique({
             where: {
                 email: email,
             },
         });
 
-        if (!existinguser) {
-            return res.status(404).json({ message: "user not found." });
+        if (!existingadmin) {
+            return res.status(404).json({ message: "admin not found." });
         }
 
         const isPasswordCorrect = await bcrypt.compare(
             password,
-            existinguser.password
+            existingadmin.password
         );
 
         if (!isPasswordCorrect) {
@@ -69,7 +69,7 @@ router.post("/login", authenticate, async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: existinguser.id, email: existinguser.email },
+            { id: existingadmin.id, email: existingadmin.email },
             SECRET_KEY,
             { expiresIn: "1h" }
         );
