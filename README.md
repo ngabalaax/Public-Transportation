@@ -2,8 +2,6 @@
 is app will help you public transportation in citys that makes easy to now what time will go and what time will stop 
 this app is development level 
 
-## coming soon إن شاء الله
-
 ## Create a new admin
 - Method: POST
 - Endpoint: /signup
@@ -84,3 +82,104 @@ this app is development level
   - Status: 200 (OK)
   - Body:
     - message: "Bus deleted successfully."
+
+# Create a new location
+
+**Route:** `POST /location/add`
+
+**Request Body:**
+```json
+{
+  "name": "Location Name",
+  "latitude": 123.456,
+  "longitude": 987.654,
+  "routeId": 1
+}
+```
+## response
+```json
+{
+  "id": 1,
+  "name": "Location Name",
+  "latitude": 123.456,
+  "longitude": 987.654,
+  "routeId": 1
+}
+```
+# Update a location
+
+**Route:** `put /location/update/:id`
+
+**Request Body:**
+```json
+{
+  "name": "New Location Name",
+  "latitude": 12.345,
+  "longitude": 98.765,
+  "routeId": 2
+}
+```
+## response
+```json
+{
+  "id": 1,
+  "name": "New Location Name",
+  "latitude": 12.345,
+  "longitude": 98.765,
+  "routeId": 2
+}
+```
+# delete a location
+
+**Route:** `delete /location/delete/:id`
+
+**Request Body:**
+```json
+{
+  "message": "Location deleted successfully"
+}
+```
+# Get all routes
+
+**Route:** `get /routes`
+
+**Request Body:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Route 1"
+  },
+  {
+    "id": 2,
+    "name": "Route 2"
+  }
+]
+```
+# Get a route by ID
+
+**Route:** `get /routes/:id`
+
+**Request Body:**
+```json
+{
+  "id": 1,
+  "name": "Route 1"
+}
+```
+
+# Create a new route
+**Route:** `post /routes/add`
+**Request Body:**
+```json
+{
+  "name": "New Route"
+}
+```
+## response
+```json
+{
+  "id": 3,
+  "name": "New Route"
+}
+```
