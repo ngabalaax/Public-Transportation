@@ -1,5 +1,6 @@
 import express from "express";
 import prisma from "./lib/index.js";
+import authenticate from "./middleware/authenticate.js";
 
 const router = express.Router();
 
@@ -13,11 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // get by id
-//router.get('/schedules/:id', async (req, res) => {
-
-// })
-
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticate, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -39,7 +36,7 @@ router.get("/:id", async (req, res) => {
 
 
 // Create a new schedule
-router.post('/new', async (req, res) => {
+router.post('/add', authenticate, async (req, res) => {
     try {
         const { busId, routeId, startTime, endTime} = req.body;
         const newschedule = await prisma.schedule.create({
@@ -54,6 +51,60 @@ router.post('/new', async (req, res) => {
             return res.status(400).json({ massega: "newschedule not created" })
         }
         res.json(newschedule);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while creating the schedule.' });
+    }
+});
+
+// update schedules
+router.put('/update/:id', authenticate, async (req, res) => {
+    try {
+
+        const { busId, routeId, startTime, endTime } = req.body;
+
+        const updateScheddules = await prisma.schedule.update({
+            where: {
+                id: Number(req.params.id),
+            },
+            data: {
+                busId,
+                routeId,
+                startTime,
+                endTime
+            }
+        });
+        if (!updateScheddules) {
+            return res.status(403).json({
+                massega: "not updated schedules"
+            });
+        }
+
+        res.json(updateScheddules)
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while creating the schedule.' });
+    }
+});
+
+// delete schedules
+router.delete('/delete/:id', authenticate, async (req, res) => {
+    try {
+
+        const deleteSchedules = await prisma.schedule.delete({
+            where: {
+                id: Number(req.params.id),
+            },
+            
+        });
+        if (!deleteSchedules) {
+            return res.status(403).json({
+                massega: "not deleted schedules"
+            });
+        }
+
+        res.status(202).json({ message: "schedule successfully deleted." });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while creating the schedule.' });

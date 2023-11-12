@@ -43,8 +43,8 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// admins logins
 
+// admins logins
 router.post("/login", authenticate, async (req, res) => {
     try {
         const { email, password } = req.body;

@@ -1,5 +1,6 @@
 import express from "express";
 import prisma from "./lib/index.js";
+import authenticate from "./middleware/authenticate.js";
 
 const router = express.Router();
 
@@ -28,7 +29,7 @@ router.get('/:id', async (req, res) => {
             });
         }
 
-        res.json(route);
+        res.json(route); authenticate
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while fetching the route.' });
@@ -36,7 +37,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new route
-router.post('/new', async (req, res) => {
+router.post('/add', authenticate, async (req, res) => {
     try {
         const { name } = req.body;
         const route = await prisma.route.create({
@@ -50,5 +51,56 @@ router.post('/new', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while creating a new route.' });
     }
 });
+
+// update route
+router.put('/update/:id', authenticate, async (req, res) => {
+    try {
+        
+        const { name } = req.body;
+
+        const updateRoute = await prisma.route.update({
+            where: {
+                id: Number(req.params.id),
+            },
+            data: {
+                name
+            }
+        });
+        if (!updateRoute) {
+            return res.status(400).json({
+                massage: "not be updeted route"
+            });
+        }
+
+        res.json(updateRoute)
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while creating a new route.' });
+    }
+});
+
+// delete route
+router.delete('/delete/:id', authenticate, async (req, res) => {
+    try {
+       
+        const deleteRoute = await prisma.route.delete({
+            where: {
+                id: Number(req.params.id),
+            },
+        });
+        if (!deleteRoute) {
+            return res.status(404).json({
+                message: "Route not found."
+            });
+        }
+
+        res.status(202).json({ message: "Route successfully deleted." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while deleting the route.' });
+    }
+});
+
 
 export default router

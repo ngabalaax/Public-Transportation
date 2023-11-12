@@ -44,8 +44,8 @@ model Schedule {
   busId     Int
   route     Route     @relation(fields: [routeId], references: [id])
   routeId   Int
-  startTime DateTime
-  endTime   DateTime
+  startTime String
+  endTime   String
   booking   Booking[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -64,8 +64,9 @@ model Booking {
   id         Int      @id @default(autoincrement())
   user       User     @relation(fields: [userId], references: [id])
   userId     Int
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  seatnumber Int
   scheduleId Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
