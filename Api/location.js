@@ -4,6 +4,7 @@ import authenticate from "./middleware/authenticate.js";
 
 const router = express.Router();
 
+//create a location
 router.post('/add', async (req, res) => {
   try {
     // Retrieve the location data from the request body

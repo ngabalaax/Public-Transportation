@@ -4,7 +4,7 @@ import prisma from "./lib/index.js";
 
 const router = express.Router();
 
-// Create a new route
+// Create a new booking
 router.post('/add', async (req, res) => {
     try {
         const { userId, seatnumber, scheduleId } = req.body;

@@ -3,7 +3,6 @@ import prisma from '../lib/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-import authenticate from '../middleware/authenticate.js';
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
