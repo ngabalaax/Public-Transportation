@@ -1,14 +1,49 @@
 import express, { json } from "express";
 import prisma from "./lib/index.js";
+import authenticateAdmin from "./middleware/adminAuth.js";
 import authenticate from "./middleware/authenticate.js";
 
 const router = express.Router();
 
+// get all locations 
+router.get('/', authenticate, async (req, res) => {
+  try {
+    const locations = await prisma.location.findMany();
+
+    if (!locations) {
+      return res.status(404).json({
+        massega: " not get locations"
+      });
+    }
+
+    // Return the  location as the response
+    res.json(locations)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the buses.' });
+  }
+})
+
 //create a location
-router.post('/add', async (req, res) => {
+router.post('/add', authenticateAdmin, async (req, res) => {
   try {
     // Retrieve the location data from the request body
-    const { name, latitude, longitude, routeId } = req.body;
+    const { adminId,name, latitude, longitude, routeId } = req.body;
+
+    // ckeching if the location is already created or not
+    const locationcheck = await prisma.location.findUnique({
+      where: {
+        latitude: latitude,
+        longitude: longitude
+      }
+    });
+
+    if (locationcheck !== null) {
+      return res.status(400).json({
+        massage: "location is already created"
+      });
+    }
+      
 
     // Validate the required fields
     if (!name || !latitude || !longitude || !routeId) {
@@ -19,6 +54,7 @@ router.post('/add', async (req, res) => {
 
     const newLocation = await prisma.location.create({
       data: {
+        adminId,
         name,
         latitude,
         longitude,
@@ -35,7 +71,7 @@ router.post('/add', async (req, res) => {
 });
 
 // update location 
-router.put('/update/:id', authenticate, async (req, res) => {
+router.put('/update/:id', authenticateAdmin, async (req, res) => {
   try {
 
     const { name, latitude, longitude, routeId } = req.body;
@@ -65,7 +101,7 @@ router.put('/update/:id', authenticate, async (req, res) => {
 });
 
 // delete location 
-router.delete('/dalete/:id', authenticate, async (req, res) => {
+router.delete('/dalete/:id', authenticateAdmin, async (req, res) => {
   try {
 
     const deletelocation = await prisma.location.delete({

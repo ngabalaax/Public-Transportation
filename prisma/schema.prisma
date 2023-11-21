@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,51 +8,69 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   name     String
-  email    String @unique
+  email    String   @unique
   password String
 
-  booking Booking[]
-  created DateTime  @default(now())
-  updated DateTime  @updatedAt
+  booking  Booking[]
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
 }
 
 model Admin {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  email     String   @unique
+  email     String     @unique
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  location  Location[]
+  bus       Bus[]
+  route     Route[]
+  schedule  Schedule[]
 }
 
 model Bus {
   id        Int        @id @default(autoincrement())
-  number    String     @unique
+  number    String     
   capacity  Int
+  adminId   Int
+
+  admin     Admin      @relation(fields: [adminId], references: [id])
+  
   schedule  Schedule[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
 
 model Schedule {
-  id        Int       @id @default(autoincrement())
-  bus       Bus       @relation(fields: [busId], references: [id])
+  id        Int        @id @default(autoincrement())
+  adminId   Int
   busId     Int
-  route     Route     @relation(fields: [routeId], references: [id])
   routeId   Int
   startTime String
   endTime   String
+
+  bus       Bus        @relation(fields: [busId], references: [id])
+  admin     Admin      @relation(fields: [adminId], references: [id])
+  route     Route      @relation(fields: [routeId], references: [id])
+
   booking   Booking[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Route {
   id        Int        @id @default(autoincrement())
-  name      String
+  name      String     @unique
+  adminId   Int
+
+  admin     Admin      @relation(fields: [adminId], references: [id])
+
   locations Location[]
   schedule  Schedule[]
   createdAt DateTime   @default(now())
@@ -61,23 +78,28 @@ model Route {
 }
 
 model Booking {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
+  id         Int        @id @default(autoincrement())
   userId     Int
-  seatnumber Int
+  fullName   String
+  seatNumber Int        @unique
   scheduleId Int
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id])
+  schedule   Schedule   @relation(fields: [scheduleId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Location {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
+  adminId   Int
   name      String
-  latitude  Float
-  longitude Float
-  route     Route    @relation(fields: [routeId], references: [id])
-  routeId   Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  latitude  Float      @unique
+  longitude Float      @unique
+  routeId   Inty
+  
+  admin     Admin      @relation(fields: [adminId], references: [id])
+  route     Route      @relation(fields: [routeId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }

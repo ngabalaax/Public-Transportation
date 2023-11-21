@@ -1,6 +1,7 @@
 import express from "express";
 import prisma from "./lib/index.js";
 import authenticate from "./middleware/authenticate.js";
+import authenticateAdmin from "./middleware/adminAuth.js";
 
 const router = express.Router();
 
@@ -36,15 +37,17 @@ router.get("/:id", authenticate, async (req, res) => {
 
 
 // Create a new schedule
-router.post('/add', authenticate, async (req, res) => {
+router.post('/add', authenticateAdmin, async (req, res) => {
     try {
-        const { busId, routeId, startTime, endTime} = req.body;
+        const { adminId, busId, routeId, startTime, endTime} = req.body;
         const newschedule = await prisma.schedule.create({
             data: {
+                adminId,
                 busId,
                 routeId,
                 startTime,
-                endTime
+                endTime,
+                
             },
         });
         if (!newschedule) {
@@ -58,7 +61,7 @@ router.post('/add', authenticate, async (req, res) => {
 });
 
 // update schedules
-router.put('/update/:id', authenticate, async (req, res) => {
+router.put('/update/:id', authenticateAdmin, async (req, res) => {
     try {
 
         const { busId, routeId, startTime, endTime } = req.body;
@@ -89,7 +92,7 @@ router.put('/update/:id', authenticate, async (req, res) => {
 });
 
 // delete schedules
-router.delete('/delete/:id', authenticate, async (req, res) => {
+router.delete('/delete/:id', authenticateAdmin, async (req, res) => {
     try {
 
         const deleteSchedules = await prisma.schedule.delete({

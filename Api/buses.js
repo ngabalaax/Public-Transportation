@@ -1,6 +1,7 @@
 import express from "express";
 import prisma from "./lib/index.js";
-import authenticate from "./middleware/authenticate.js";
+ 
+import authenticateAdmin from "./middleware/adminAuth.js";
 
 const router = express.Router();
 
@@ -19,8 +20,9 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching the buses.' });
     }
 });
+
 // Get a bus by ID
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticateAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const bus = await prisma.bus.findUnique({
@@ -41,15 +43,27 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 // Create a new bus
-router.post('/add', authenticate, async (req, res) => {
+router.post('/add', authenticateAdmin, async (req, res) => {
     try {
-        const { number, capacity } = req.body;
+        const { number, capacity, adminId } = req.body;
+        
+        const buscheck = await prisma.bus.findUnique({
+            where: {
+                number: number
+            }
+        });
 
+        if(buscheck !== null ){
+            return res.status(400).json({
+                massage: "bus is already created"
+            });
+        }
 
         const bus = await prisma.bus.create({
             data: {
                 number,
-                capacity
+                capacity,
+                adminId
             },
         });
         if (!bus) {
@@ -65,7 +79,7 @@ router.post('/add', authenticate, async (req, res) => {
 });
 
 // update a bus 
-router.put('/update/:id', authenticate, async (req, res) => {
+router.put('/update/:id', authenticateAdmin, async (req, res) => {
     try {
        
         const { number, capacity } = req.body;
@@ -93,9 +107,8 @@ router.put('/update/:id', authenticate, async (req, res) => {
 });
 
 // Delete a bus
-router.delete('/delete/:id', authenticate, async (req, res) => {
+router.delete('/delete/:id', authenticateAdmin, async (req, res) => {
     try {
-        //sconst { id } = req.params;
 
         const deletedBus = await prisma.bus.delete({
             where: {

@@ -1,6 +1,7 @@
 import express from "express";
 import prisma from "./lib/index.js";
 import authenticate from "./middleware/authenticate.js";
+import authenticateAdmin from "./middleware/adminAuth.js";
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get a route by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
     try {
         const { id } = req.params;
         const route = await prisma.route.findUnique({
@@ -37,12 +38,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new route
-router.post('/add', authenticate, async (req, res) => {
+router.post('/add', authenticateAdmin, async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, adminId } = req.body;
         const route = await prisma.route.create({
             data: {
                 name,
+                adminId
             },
         });
         res.json(route);
@@ -53,7 +55,7 @@ router.post('/add', authenticate, async (req, res) => {
 });
 
 // update route
-router.put('/update/:id', authenticate, async (req, res) => {
+router.put('/update/:id', authenticateAdmin, async (req, res) => {
     try {
         
         const { name } = req.body;
@@ -81,7 +83,7 @@ router.put('/update/:id', authenticate, async (req, res) => {
 });
 
 // delete route
-router.delete('/delete/:id', authenticate, async (req, res) => {
+router.delete('/delete/:id', authenticateAdmin, async (req, res) => {
     try {
        
         const deleteRoute = await prisma.route.delete({
