@@ -36,7 +36,7 @@ model Admin {
 
 model Bus {
   id        Int        @id @default(autoincrement())
-  number    String     
+  number    String     @unique
   capacity  Int
   adminId   Int
 
@@ -96,7 +96,7 @@ model Location {
   name      String
   latitude  Float      @unique
   longitude Float      @unique
-  routeId   Inty
+  routeId   Int
   
   admin     Admin      @relation(fields: [adminId], references: [id])
   route     Route      @relation(fields: [routeId], references: [id])

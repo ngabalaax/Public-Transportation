@@ -47,17 +47,17 @@ router.post('/add', authenticateAdmin, async (req, res) => {
     try {
         const { number, capacity, adminId } = req.body;
         
-        const buscheck = await prisma.bus.findUnique({
+         const buscheck = await prisma.bus.findUnique({
             where: {
                 number: number
             }
-        });
+        }); 
 
         if(buscheck !== null ){
             return res.status(400).json({
                 massage: "bus is already created"
             });
-        }
+        }   
 
         const bus = await prisma.bus.create({
             data: {
